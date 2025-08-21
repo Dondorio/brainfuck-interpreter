@@ -5,10 +5,13 @@
 #include "types.hpp"
 
 void eval(std::vector<Instruction> instructions, uint8_t data[],
-          uint32_t cellPointer, uint32_t sliceBegin, uint32_t sliceEnd)
+          uint32_t& cellPointer, uint32_t sliceBegin, uint32_t sliceEnd)
 {
     for (uint32_t i = sliceBegin; i < sliceEnd; i++)
     {
+        // printf("eval: ");
+        // instructions[i].print(instructions[i]);
+
         switch (instructions[i].ast)
         {
             case Add:
@@ -34,11 +37,17 @@ void eval(std::vector<Instruction> instructions, uint8_t data[],
             case LoopBegin:
             {
                 int looplen = instructions[i].loopLen;
+                const uint32_t loop_start_cell_pointer = cellPointer;
 
-                while (data[cellPointer] != 0)
+                // std::printf("inside loop: data = %d             \r",
+                // data[loop_start_cell_pointer]);
+
+                while (data[loop_start_cell_pointer] != 0)
                 {
                     eval(instructions, data, cellPointer, i + 1, i + looplen);
                 }
+
+                // printf("exited loop\n");
 
                 // Skip over items inside loop
                 // -1 because the for loop already adds 1
@@ -48,7 +57,11 @@ void eval(std::vector<Instruction> instructions, uint8_t data[],
             }
             case Print:
             {
-                printf("print: %c", data[cellPointer]);
+                // std::printf("found print!\n");
+                for (int p = 0; p < instructions[i].repeat; p++)
+                {
+                    putchar(data[cellPointer]);
+                }
                 break;
             }
             case Input:

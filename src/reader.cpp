@@ -15,7 +15,6 @@ std::vector<Instruction> readStr(std::string str)
     int rep = 0;
 
     std::vector<Loop> pendingLoops;
-    int pendingLoopOffset = 0;
 
     for (int i = 0; i <= chars.length(); i++)
     {
@@ -27,7 +26,8 @@ std::vector<Instruction> readStr(std::string str)
             continue;
         }
 
-        if (chars[i] == lastChar && i < chars.length() - 1)
+        if (currentChar == lastChar && i < chars.length() - 1 &&
+            currentChar != '[' && currentChar != ']')
         {
             rep++;
             lastChar = currentChar;
@@ -71,6 +71,9 @@ std::vector<Instruction> readStr(std::string str)
             }
             case '[':
             {
+                tmp.ast = Ast::LoopBegin;
+                instructions.push_back(tmp);
+
                 pendingLoops.push_back(
                     {static_cast<int>(instructions.size()), 0});
 
@@ -85,19 +88,13 @@ std::vector<Instruction> readStr(std::string str)
             }
             case ']':
             {
-                Loop l = pendingLoops.front();
-                // pop oldest
-                pendingLoops.erase(pendingLoops.begin());
+                Loop l = pendingLoops.back();
+                pendingLoops.pop_back();
 
-                tmp.ast = Ast::LoopBegin;
-                tmp.loopLen = l.len;
+                instructions[l.pos - 1].loopLen = l.len;
 
                 rep = 0;
                 lastChar = currentChar;
-
-                instructions.insert(
-                    instructions.begin() + l.pos + pendingLoopOffset, tmp);
-                pendingLoopOffset++;
 
                 continue;
             }
@@ -119,6 +116,11 @@ std::vector<Instruction> readStr(std::string str)
         lastChar = currentChar;
         rep = 0;
         instructions.push_back(tmp);
+    }
+
+    if (!pendingLoops.empty())
+    {
+        throw "expected ']', found EOF";
     }
 
     return instructions;
