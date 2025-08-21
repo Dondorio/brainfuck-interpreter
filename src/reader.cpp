@@ -2,8 +2,11 @@
 #include <string>
 #include <vector>
 
+#include "reader.hpp"
 #include "types.hpp"
 
+namespace reader
+{
 std::vector<Instruction> readStr(std::string str)
 {
     std::string chars = str;
@@ -88,6 +91,9 @@ std::vector<Instruction> readStr(std::string str)
             }
             case ']':
             {
+                if (pendingLoops.empty())
+                    throw Error::NoOpenBracket;
+
                 Loop l = pendingLoops.back();
                 pendingLoops.pop_back();
 
@@ -119,9 +125,8 @@ std::vector<Instruction> readStr(std::string str)
     }
 
     if (!pendingLoops.empty())
-    {
-        throw "expected ']', found EOF";
-    }
+        throw Error::BracketEof;
 
     return instructions;
 }
+} // namespace reader
