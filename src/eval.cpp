@@ -6,8 +6,9 @@
 #include "globabs.hpp"
 #include "types.hpp"
 
-void eval(std::vector<Instruction> instructions, uint8_t data[],
-          uint32_t& cellPointer, uint32_t sliceBegin, uint32_t sliceEnd)
+void eval(const std::vector<Instruction>& instructions, uint8_t data[],
+          uint32_t& cellPointer, const uint32_t& sliceBegin,
+          const uint32_t& sliceEnd)
 {
     for (uint32_t i = sliceBegin; i < sliceEnd; i++)
     {
@@ -36,7 +37,7 @@ void eval(std::vector<Instruction> instructions, uint8_t data[],
             {
                 cellPointer -= instructions[i].repeat;
 
-                if (cellPointer > 0)
+                if (cellPointer < 0)
                     throw 0;
 
                 break;

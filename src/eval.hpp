@@ -5,5 +5,6 @@
 
 #include "types.hpp"
 
-void eval(std::vector<Instruction> instructions, uint8_t data[],
-          uint32_t &cellPointer, uint32_t sliceBegin, uint32_t sliceEnd);
+void eval(const std::vector<Instruction>& instructions, uint8_t data[],
+          uint32_t& cellPointer, const uint32_t& sliceBegin,
+          const uint32_t& sliceEnd);
